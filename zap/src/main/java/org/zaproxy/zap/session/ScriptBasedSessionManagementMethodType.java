@@ -139,6 +139,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
         @Override
         public WebSession extractWebSession(HttpMessage msg) {
+            LOG.info("@extractWebSession:0");
             SessionScript sessionScript = getScriptInterface(script);
             if (sessionScript != null) {
                 SessionWrapper wrapper = getSessionWrapper(msg);
@@ -149,6 +150,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                 }
                 return wrapper.getSession();
             }
+            LOG.info("@extractWebSession:1");
             return new ScriptBasedSession();
         }
 
@@ -159,6 +161,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
         @Override
         public void clearWebSessionIdentifiers(HttpMessage msg) {
+            LOG.info("@clearWebSessionIdentifiers:0");
             SessionScript sessionScript = getScriptInterface(script);
             if (sessionScript != null) {
                 try {
@@ -167,14 +170,17 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                     getScriptsExtension().handleScriptException(script, e);
                 }
             }
+            LOG.info("@clearWebSessionIdentifiers:1");
         }
 
         @Override
         public ApiResponse getApiResponseRepresentation() {
+            LOG.info("@getApiResponseRepresentation:0");
             Map<String, String> values = new HashMap<>();
             values.put("methodName", API_METHOD_NAME);
             values.put("scriptName", script.getName());
             values.putAll(paramValues);
+            LOG.info("@getApiResponseRepresentation:1");
             return new SessionMethodApiResponseRepresentation<>(values);
         }
 
@@ -182,6 +188,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
         public void processMessageToMatchSession(HttpMessage message, WebSession session)
                 throws UnsupportedWebSessionException {
             SessionScript sessionScript = getScriptInterface(script);
+            LOG.info("@processMessageToMatchSession:0");
             if (sessionScript != null) {
                 try {
                     sessionScript.processMessageToMatchSession(getSessionWrapper(message));
@@ -189,13 +196,16 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                     getScriptsExtension().handleScriptException(script, e);
                 }
             }
+            LOG.info("@processMessageToMatchSession:1");
         }
 
         @Override
         public SessionManagementMethod clone() {
+            LOG.info("@clone:0");
             ScriptBasedSessionManagementMethod method = new ScriptBasedSessionManagementMethod();
             method.script = this.script;
             method.paramValues = new HashMap<String, String>(this.paramValues);
+            LOG.info("@clone:1");
             return method;
         }
 
@@ -233,6 +243,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
     @Override
     public ScriptBasedSessionManagementMethod createSessionManagementMethod(int contextId) {
+        LOG.info("@ScriptBasedSessionManagementMethod:0");
         return new ScriptBasedSessionManagementMethod();
     }
 
@@ -288,6 +299,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
         @SuppressWarnings("unchecked")
         private void initialize() {
+            LOG.info("@initialize:0");
             this.setLayout(new GridBagLayout());
 
             this.add(new JLabel(SCRIPT_NAME_LABEL), LayoutHelper.getGBC(0, 0, 1, 0.0d, 0.0d));
@@ -319,6 +331,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
             this.dynamicContentPanel = new JPanel(new BorderLayout());
             this.add(this.dynamicContentPanel, LayoutHelper.getGBC(0, 1, 3, 1.0d, 0.0d));
             this.dynamicContentPanel.add(new JLabel(LABEL_NOT_LOADED));
+            LOG.info("@initialize:1");
         }
 
         @Override
@@ -345,6 +358,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
         }
 
         private void loadScript(ScriptWrapper scriptW, boolean adaptOldValues) {
+            LOG.info("@loadScript:0");
             SessionScript script = getScriptInterface(scriptW);
 
             if (script == null) {
@@ -392,9 +406,11 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                                 "session.method.script.dialog.error.text.loading",
                                 ExceptionUtils.getRootCauseMessage(e)));
             }
+            LOG.info("@loadScript:1");
         }
 
         private void warnAndResetPanel(String errorMessage) {
+            LOG.info("@warnAndResetPanel:0");
             JOptionPane.showMessageDialog(
                     this,
                     errorMessage,
@@ -406,11 +422,13 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
             this.dynamicContentPanel.removeAll();
             this.dynamicContentPanel.add(new JLabel(LABEL_NOT_LOADED), BorderLayout.CENTER);
             this.dynamicContentPanel.revalidate();
+            LOG.info("@warnAndResetPanel:1");
         }
 
         @Override
         public void bindMethod(SessionManagementMethod method)
                 throws UnsupportedSessionManagementMethodException {
+            LOG.info("@bindMethod:0");
             this.method = (ScriptBasedSessionManagementMethod) method;
 
             // Make sure the list of scripts is refreshed
@@ -428,6 +446,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                     this.dynamicFieldsPanel.bindFieldValues(this.method.paramValues);
                 }
             }
+            LOG.info("@bindMethod:1");
         }
 
         @Override
@@ -454,6 +473,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
         @SuppressWarnings("rawtypes")
         public Component getListCellRendererComponent(
                 JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            LOG.info("@getListCellRendererComponent:0");
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value != null) {
                 setBorder(BORDER);
@@ -465,15 +485,17 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                                     + " (loaded)</b></html>");
                 else setText(item.getName());
             }
+            LOG.info("@getListCellRendererComponent:1");
             return this;
         }
     }
 
     @Override
     public void hook(ExtensionHook extensionHook) {
+        LOG.info("@hook:0");
         // Hook up the Script Type
         if (getScriptsExtension() != null) {
-            LOG.debug("Registering Script...");
+            LOG.info("Registering Script...");
             getScriptsExtension()
                     .registerScriptType(
                             new ScriptType(
@@ -483,11 +505,13 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                                     false,
                                     new String[] {ScriptType.CAPABILITY_APPEND}));
         }
+        LOG.info("@hook:1");
     }
 
     @Override
     public SessionManagementMethod loadMethodFromSession(Session session, int contextId)
             throws DatabaseException {
+        LOG.info("@loadMethodFromSession:0");
         ScriptBasedSessionManagementMethod method = new ScriptBasedSessionManagementMethod();
 
         List<String> scripts =
@@ -502,11 +526,13 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                     session.getContextDataStrings(
                             contextId, RecordContext.TYPE_SESSION_MANAGEMENT_FIELD_2));
         }
+        LOG.info("@loadMethodFromSession:1");
         return method;
     }
 
     @Override
     public void exportData(Configuration config, SessionManagementMethod sessionMethod) {
+        LOG.info("@exportData:0");
         if (!(sessionMethod instanceof ScriptBasedSessionManagementMethod)) {
             throw new UnsupportedSessionManagementMethodException(
                     "Script based session management type only supports: "
@@ -520,13 +546,14 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
         config.setProperty(
                 CONTEXT_CONFIG_SESSION_MGMT_SCRIPT_PARAMS,
                 EncodingUtils.mapToString(method.paramValues));
+        LOG.info("@exportData:1");
     }
 
     @Override
     public void persistMethodToSession(
             Session session, int contextId, SessionManagementMethod method)
             throws DatabaseException {
-
+        LOG.info("@persistMethodToSession:0");
         if (!(method instanceof ScriptBasedSessionManagementMethod)) {
             throw new UnsupportedSessionManagementMethodException(
                     "Script based session management type only supports: "
@@ -545,13 +572,14 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                 contextId,
                 RecordContext.TYPE_SESSION_MANAGEMENT_FIELD_2,
                 EncodingUtils.mapToString(scriptMethod.paramValues));
+        LOG.info("@persistMethodToSession:1");
     }
 
     private void loadMethod(
             ScriptBasedSessionManagementMethod method,
             String scriptName,
             List<String> paramValuesS) {
-
+        LOG.info("@loadMethod:0");
         // Load the script and make sure it still exists and still follows the required interface
         if (scriptName != null) {
             ScriptWrapper script = getScriptsExtension().getScript(scriptName);
@@ -580,6 +608,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                                 + " does not properly implement the Session Management Script interface.");
                 return;
             }
+            LOG.info("@loadMethod:1");
         }
 
         // Load the parameter values
@@ -598,6 +627,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
     @Override
     public void importData(Configuration config, SessionManagementMethod sessionMethod)
             throws ConfigurationException {
+        LOG.info("@importData:0");
         if (!(sessionMethod instanceof ScriptBasedSessionManagementMethod)) {
             throw new UnsupportedSessionManagementMethodException(
                     "Script based session management type only supports: "
@@ -609,13 +639,16 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                 method,
                 config.getString(CONTEXT_CONFIG_SESSION_MGMT_SCRIPT_NAME),
                 objListToStrList(config.getList(CONTEXT_CONFIG_SESSION_MGMT_SCRIPT_PARAMS)));
+        LOG.info("@importData:1");
     }
 
     private static List<String> objListToStrList(List<Object> oList) {
+        LOG.info("@objListToStrList:0");
         List<String> sList = new ArrayList<String>(oList.size());
         for (Object o : oList) {
             sList.add(o.toString());
         }
+        LOG.info("@objListToStrList:1");
         return sList;
     }
 
@@ -632,6 +665,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
             @Override
             public void handleAction(JSONObject params) throws ApiException {
+                LOG.info("@handleAction:0");
                 Context context =
                         ApiUtils.getContextByParamId(params, SessionManagementAPI.PARAM_CONTEXT_ID);
                 String scriptName = ApiUtils.getNonEmptyStringParam(params, PARAM_SCRIPT_NAME);
@@ -678,11 +712,13 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                     LOG.debug("Loaded session management script parameters:" + paramValues);
 
                 context.setSessionManagementMethod(method);
+                LOG.info("@handleAction:1");
             }
         };
     }
 
     private static ExtensionScript getScriptsExtension() {
+        LOG.info("@getScriptsExtension");
         if (extensionScript == null)
             extensionScript =
                     Control.getSingleton().getExtensionLoader().getExtension(ExtensionScript.class);
@@ -690,6 +726,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
     }
 
     private static SessionScript getScriptInterface(ScriptWrapper script) {
+        LOG.info("@getScriptInterface:0");
         try {
             return getScriptsExtension().getInterface(script, SessionScript.class);
         } catch (Exception e) {
@@ -700,6 +737,7 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
                                     "session.method.script.dialog.error.text.interface",
                                     script.getName()));
         }
+        LOG.info("@getScriptInterface:1");
         return null;
     }
 
@@ -711,9 +749,11 @@ public class ScriptBasedSessionManagementMethodType extends SessionManagementMet
 
         public SessionWrapper(
                 ScriptBasedSession session, HttpMessage msg, Map<String, String> paramValues) {
+            LOG.info("@SessionWrapper:0");
             this.session = session;
             this.httpMessage = msg;
             this.paramValues = paramValues;
+            LOG.info("@SessionWrapper:1");
         }
 
         public ScriptBasedSession getSession() {
